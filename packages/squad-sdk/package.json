@@ -110,6 +110,10 @@
       "types": "./dist/adapter/errors.d.ts",
       "import": "./dist/adapter/errors.js"
     },
+    "./adapter/claude": {
+      "types": "./dist/adapter/claude-client.d.ts",
+      "import": "./dist/adapter/claude-client.js"
+    },
     "./config/migrations": {
       "types": "./dist/config/migrations/index.d.ts",
       "import": "./dist/config/migrations/index.js"
