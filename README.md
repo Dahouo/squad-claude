@@ -6,6 +6,7 @@
 
 [![Status](https://img.shields.io/badge/status-alpha-blueviolet)](#status)
 [![Platform](https://img.shields.io/badge/platform-GitHub%20Copilot-blue)](#what-is-squad)
+[![Platform](https://img.shields.io/badge/platform-Claude%20Code-orange)](#using-squad-with-claude-code)
 
 > ⚠️ **Alpha Software** — Squad is experimental. APIs and CLI commands may change between releases. We'll document breaking changes in [CHANGELOG.md](CHANGELOG.md).
 
@@ -73,6 +74,63 @@ Here's what I'm building: a recipe sharing app with React and Node.
 **✓ Validate:** Squad responds with team member proposals. Type `yes` to confirm — they're ready to work.
 
 Squad proposes a team — each member named from a persistent thematic cast. You say **yes**. They're ready.
+
+---
+
+## Using Squad with Claude Code
+
+> This fork adds native Claude Code support. The team state in `.squad/` is shared — work done through Copilot is visible in Claude Code sessions and vice versa.
+
+### 1. Install Squad and init your team
+
+```bash
+npm install -g @bradygaster/squad-cli
+squad init
+```
+
+### 2. Open your project in Claude Code
+
+The `/squad`, `/squad-route`, `/squad-status`, and `/squad-memory` commands are available immediately — no extra setup needed.
+
+### 3. Talk to your team
+
+```
+/squad Build the OAuth login flow
+```
+
+The coordinator reads `.github/agents/squad.agent.md`, applies your routing rules from `.squad/routing.md`, and dispatches agents in parallel using Claude Code's Agent tool.
+
+### Claude Code Commands
+
+| Command | What it does |
+|---------|-------------|
+| `/squad <request>` | Activate the Squad coordinator — routes work to specialist agents |
+| `/squad-route <agent> <task>` | Route directly to a specific agent by name |
+| `/squad-status` | Show active roster, recent decisions, and open issues |
+| `/squad-memory <agent> <note>` | Append a memory entry to an agent's history |
+
+### Using the Anthropic SDK adapter (no Copilot required)
+
+The `ClaudeSquadClient` lets you run Squad agents programmatically against the Anthropic API:
+
+```typescript
+import { ClaudeSquadClient } from '@bradygaster/squad-sdk/adapter/claude';
+
+const client = new ClaudeSquadClient(); // uses ANTHROPIC_API_KEY env var
+const session = await client.createSession({
+  model: 'claude-sonnet-4-6',
+  systemMessage: {
+    mode: 'replace',
+    content: 'You are EECOM, the Core Dev on this project. ...',
+  },
+  tools: [...squadTools],
+});
+
+const result = await session.sendAndWait({ prompt: 'Fix the auth bug' });
+await session.close();
+```
+
+Install the peer dependency: `npm install @anthropic-ai/sdk`
 
 ---
 
